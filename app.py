@@ -10,12 +10,17 @@ st.set_page_config(
     page_title="AT HSE Management Dashboard", page_icon="🛡️", layout="wide"
 )
 
-# Custom CSS for styling
+# Custom CSS for styling & print optimization
 st.markdown(
     """
     <style>
     .main { background-color: #f8f9fa; }
     .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    @media print {
+        body { background-color: white; color: black; }
+        .stSidebar { display: none; }
+        .stButton { display: none; }
+    }
     </style>
 """,
     unsafe_allow_html=True,
@@ -75,19 +80,24 @@ def load_data():
       "stats": ["OPEN", "CLOSED", "IN PROGRESS"],
   }
 
-  # Expanded sample DataFrame representing the register
   df_register = pd.DataFrame(
       {
-          "No.": [1, 2, 3, 4, 5, 6, 7, 8],
+          "No.": [1, 2, 3, 4, 5, 6],
           "Date": [
-              "2026-10-18",
               "2026-10-18",
               "2026-10-18",
               "2026-10-18",
               "2026-10-19",
               "2026-10-26",
               "2026-10-27",
-              "2026-10-27",
+          ],
+          "Description": [
+              "Labors working at Height on Tower crane without Harness",
+              "Labor working without any PPE on construction site",
+              "Scaffolding without proper platform/harness",
+              "Labor working at height without safety harness",
+              "Wooden structure about to collapse",
+              "Uncovered electrical panel in workshop area",
           ],
           "Observed By": [
               "Repak Dawdi",
@@ -95,71 +105,51 @@ def load_data():
               "Repak Dawdi",
               "Repak Dawdi",
               "Repak Dawdi",
-              "Repak Dawdi",
               "Shad Ibrahim",
-              "David Gallagher",
           ],
-          "Location": ["B1", "BT1", "B2", "B1", "B2", "B1", "Workshop", "Main Offices"],
+          "Location": ["B1", "BT1", "B2", "B2", "B1", "Workshop"],
+          "Suggested / Action Taken": [
+              "Informed supervisor to provide harness",
+              "Stopped work, instructed to wear PPE",
+              "Updated HSE management procedure",
+              "Stopped work, provided harness",
+              "Barricaded and removed hazard",
+              "Notified electrical team to rectify",
+          ],
           "Company Concerned": [
               "Aram Tower",
               "Formwork and Reinforcement",
               "Formwork and Reinforcement",
-              "ESF Post-tensioning",
               "Formwork and Reinforcement",
               "Formwork and Reinforcement",
               "KNR",
-              "PPCL",
-          ],
-          "Description": [
-              "Labors working at Height on Tower crane without Harness",
-              "Labor working without any PPE on construction site",
-              "Scaffolding without proper platform/harness",
-              "Post tensioning Staff safely performing work",
-              "Labor working at height without safety harness",
-              "Wooden structure about to collapse",
-              "Uncovered electrical panel in workshop area",
-              "Good housekeeping observed in main office",
           ],
           "Type": [
               "Intervention",
               "Intervention",
               "Observation",
-              "Observation",
               "Intervention",
               "Observation",
               "Intervention",
-              "Observation",
           ],
-          "Discipline": [
-              "Safety",
-              "Safety",
-              "Safety",
-              "Safety",
-              "Safety",
-              "Safety",
-              "Safety",
-              "Health",
+          "Discipline": ["Safety", "Safety", "Safety", "Safety", "Safety", "Safety"],
+          "Submission Type": [
+              "Unsafe Activity",
+              "Unsafe Condition",
+              "Unsafe Activity",
+              "Unsafe Activity",
+              "Unsafe Condition",
+              "Unsafe Condition",
           ],
           "Observation Category": [
               "Working at Height",
               "PPE / Safety Equipment",
-              "Scaffolding",
-              "Positive",
+              "Working at Height",
               "Working at Height",
               "Bypassing Safety Controls",
               "Electrical Hazard",
-              "Housekeeping",
           ],
-          "Status": [
-              "CLOSED",
-              "CLOSED",
-              "IN PROGRESS",
-              "CLOSED",
-              "CLOSED",
-              "OPEN",
-              "OPEN",
-              "CLOSED",
-          ],
+          "Status": ["CLOSED", "CLOSED", "IN PROGRESS", "CLOSED", "OPEN", "OPEN"],
       }
   )
   return lists, df_register
@@ -173,6 +163,7 @@ page = st.sidebar.radio(
     "Navigation",
     [
         "📊 Higher Management Dashboard",
+        "🖨️ Printable Daily HSE Report",
         "🔍 Category & Status Explorer",
         "📝 New HSE Observation (Form)",
         "📋 Observation Register",
@@ -180,7 +171,7 @@ page = st.sidebar.radio(
 )
 
 # ----------------------------------------------------
-# PAGE 1: HIGHER MANAGEMENT DASHBOARD (CHARTS)
+# PAGE 1: HIGHER MANAGEMENT DASHBOARD
 # ----------------------------------------------------
 if page == "📊 Higher Management Dashboard":
   st.title("Executive HSE Performance Dashboard")
@@ -189,7 +180,6 @@ if page == "📊 Higher Management Dashboard":
       " compliance for higher management."
   )
 
-  # Top KPI Summary Cards
   col1, col2, col3, col4, col5 = st.columns(5)
   col1.metric("Total Observations", "303", "+12 this week")
   col2.metric("Safe Activities", "61", "20%")
@@ -199,9 +189,7 @@ if page == "📊 Higher Management Dashboard":
 
   st.markdown("---")
 
-  # Row 1: Charts
   chart_col1, chart_col2 = st.columns(2)
-
   with chart_col1:
     st.subheader("⚠️ Top Observation Categories")
     cat_data = pd.DataFrame(
@@ -243,9 +231,7 @@ if page == "📊 Higher Management Dashboard":
     fig_sub.update_layout(margin=dict(l=0, r=0, t=10, b=0))
     st.plotly_chart(fig_sub, use_container_width=True)
 
-  # Row 2: Contractor & Status
   chart_col3, chart_col4 = st.columns(2)
-
   with chart_col3:
     st.subheader("🏢 Contractor Performance (Concerns)")
     con_data = pd.DataFrame(
@@ -276,26 +262,72 @@ if page == "📊 Higher Management Dashboard":
     st.plotly_chart(fig_status, use_container_width=True)
 
 # ----------------------------------------------------
-# PAGE 2: CATEGORY & STATUS EXPLORER (NEW SECTION)
+# PAGE 2: PRINTABLE DAILY HSE REPORT
+# ----------------------------------------------------
+elif page == "🖨️ Printable Daily HSE Report":
+  st.title("📄 Daily HSE Report & Print Preview")
+  st.markdown(
+      "Formatted for daily management distribution and printing. Click your"
+      " browser's print button (`Ctrl + P` / `Cmd + P`) to export as PDF or"
+      " print."
+  )
+
+  # Report Date selector
+  report_date = st.date_input("Select Report Date", datetime.date.today())
+
+  st.markdown("---")
+  st.markdown(
+      f"### 🛡️ AT HSE Daily Safety Report — {report_date.strftime('%B %d, %Y')}"
+  )
+
+  # Manpower & Man-Hours Section
+  col_mh1, col_mh2, col_mh3 = st.columns(3)
+  total_manpower = col_mh1.number_input("Total Site Manpower", value=450, step=10)
+  safe_man_hours = col_mh2.number_input(
+      "Total Safe Man-Hours (Cumulative)", value=124500, step=500
+  )
+  lti_count = col_mh3.number_input(
+      "Lost Time Injuries (LTI) Today", value=0, step=1
+  )
+
+  st.markdown("---")
+  st.markdown("#### 📊 Daily HSE Key Performance Indicators (KPIs)")
+
+  kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+  kpi1.metric("LTI", lti_count)
+  kpi2.metric("Near Misses", "1")
+  kpi3.metric("Unsafe Acts", "3")
+  kpi4.metric("Unsafe Conditions", "2")
+  kpi5.metric("Safe Conditions", "1")
+
+  st.markdown("---")
+  st.markdown("#### 📋 Daily Observation Log (OCR Summary)")
+  st.dataframe(df_register, use_container_width=True)
+
+  st.markdown("---")
+  sig1, sig2 = st.columns(2)
+  sig1.markdown("**Prepared By:** HSE Officer\n\nSignature: ______________________")
+  sig2.markdown(
+      "**Approved By:** Project Manager\n\nSignature:"
+      " ______________________"
+  )
+
+# ----------------------------------------------------
+# PAGE 3: CATEGORY & STATUS EXPLORER
 # ----------------------------------------------------
 elif page == "🔍 Category & Status Explorer":
   st.title("🔍 Category & Item Count Explorer")
   st.markdown(
-      "Select any category, item, or status below to instantly check total"
-      " occurrences until now and view matching records."
+      "Select any category, item, or status below to check total occurrences"
+      " and view matching records."
   )
 
-  # Quick Filter Shortcut for OPEN observations
-  col_shortcut, col_blank = st.columns([2, 2])
-  with col_shortcut:
-    if st.button("🚨 Show All OPEN Observations Directly"):
-      st.session_state["quick_status"] = "OPEN"
+  if st.button("🚨 Show All OPEN Observations Directly"):
+    st.session_state["quick_status"] = "OPEN"
 
   st.markdown("---")
 
-  # Filter Controls
   f_col1, f_col2, f_col3 = st.columns(3)
-
   with f_col1:
     selected_status = st.selectbox(
         "Filter by Status",
@@ -313,27 +345,12 @@ elif page == "🔍 Category & Status Explorer":
         ["(All Companies)"] + list(df_register["Company Concerned"].unique()),
     )
 
-  f_col4, f_col5 = st.columns(2)
-  with f_col4:
-    selected_location = st.selectbox(
-        "Filter by Location", ["(All Locations)"] + list(df_register["Location"].unique())
-    )
-  with f_col5:
-    selected_observer = st.selectbox(
-        "Filter by Observed By",
-        ["(All Observers)"] + list(df_register["Observed By"].unique()),
-    )
-
-  # Apply filtering logic
   filtered_df = df_register.copy()
-
   if (
       "quick_status" in st.session_state
       and st.session_state["quick_status"] == "OPEN"
   ):
     filtered_df = filtered_df[filtered_df["Status"] == "OPEN"]
-    st.info("📌 Showing 1-Click Quick Filter: **OPEN Observations**")
-    # Reset quick status after applying so user can change filters freely
     del st.session_state["quick_status"]
   else:
     if selected_status != "(All Statuses)":
@@ -346,46 +363,32 @@ elif page == "🔍 Category & Status Explorer":
       filtered_df = filtered_df[
           filtered_df["Company Concerned"] == selected_company
       ]
-    if selected_location != "(All Locations)":
-      filtered_df = filtered_df[filtered_df["Location"] == selected_location]
-    if selected_observer != "(All Observers)":
-      filtered_df = filtered_df[filtered_df["Observed By"] == selected_observer]
 
-  # Metric Display for Count
   st.markdown("---")
   m1, m2, m3 = st.columns(3)
   m1.metric("Total Matching Records", len(filtered_df))
   m2.metric(
-      "Open Count in Selection",
-      len(filtered_df[filtered_df["Status"] == "OPEN"]),
+      "Open Count", len(filtered_df[filtered_df["Status"] == "OPEN"])
   )
   m3.metric(
-      "Closed Count in Selection",
-      len(filtered_df[filtered_df["Status"] == "CLOSED"]),
+      "Closed Count", len(filtered_df[filtered_df["Status"] == "CLOSED"])
   )
 
   st.subheader("📋 Filtered Observations Table")
   st.dataframe(filtered_df, use_container_width=True)
 
 # ----------------------------------------------------
-# PAGE 3: NEW HSE OBSERVATION FORM
+# PAGE 4: NEW HSE OBSERVATION FORM
 # ----------------------------------------------------
 elif page == "📝 New HSE Observation (Form)":
   st.title("📝 HSE Observation & Intervention Form")
-  st.markdown(
-      "Fill out the inspection details below using the standardized dropdown"
-      " lists from the site register."
-  )
-
   with st.form("observation_form"):
     col1, col2 = st.columns(2)
-
     with col1:
       obs_date = st.date_input("Observation Date", datetime.date.today())
       observed_by = st.selectbox("Observed By (Observer)", lists["observers"])
       location = st.selectbox("Location / Area", lists["locations"])
       company = st.selectbox("Company Concerned", lists["companies"])
-
     with col2:
       obs_type = st.selectbox("Submission Type", lists["types"])
       discipline = st.selectbox("Discipline", lists["disciplines"])
@@ -400,26 +403,14 @@ elif page == "📝 New HSE Observation (Form)":
         "Suggested / Immediate Action Taken",
         placeholder="Action taken or recommendation...",
     )
-
-    uploaded_photo = st.file_uploader(
-        "Upload Visual Photograph", type=["jpg", "png", "jpeg"]
-    )
-
     submitted = st.form_submit_button("Submit Observation Record")
-
     if submitted:
-      st.success(
-          "✅ HSE Observation successfully recorded and synced to the database!"
-      )
+      st.success("✅ HSE Observation successfully recorded!")
       st.balloons()
 
 # ----------------------------------------------------
-# PAGE 4: OBSERVATION REGISTER TABLE
+# PAGE 5: OBSERVATION REGISTER TABLE
 # ----------------------------------------------------
 elif page == "📋 Observation Register":
   st.title("📋 Live Observation Register")
-  st.markdown(
-      "Filter and review all submitted safety observations across project"
-      " zones."
-  )
   st.dataframe(df_register, use_container_width=True)
