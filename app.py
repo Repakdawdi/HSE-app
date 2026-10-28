@@ -102,7 +102,22 @@ if page == "📊 Higher Management Dashboard":
                 "Count": [29, 19, 18, 24, 21, 10],
             }
         )
-        fig_cat = px.bar(cat_data, x="Count", y="Category", orientation="h")
+    with chart_col1:
+      st.subheader("⚠️ Top Observation Categories")
+      cat_data = pd.DataFrame(
+          {
+              "Category": [
+                  "PPE / Safety Equipment",
+                  "Electrical Hazard",
+                  "Working at Height",
+                  "Housekeeping",
+                  "Tools & Equipment",
+                  "Slip/Trip/Fall",
+              ],
+              "Count": [29, 19, 18, 24, 21, 10],
+          }
+      )
+      fig_cat = px.bar(cat_data, x="Count", y="Category", orientation="h")
       fig_cat.update_traces(marker_color="#e63946")
       fig_cat.update_layout(
           yaxis={"categoryorder": "total ascending"},
