@@ -153,13 +153,8 @@ if page == "📊 Higher Management Dashboard":
                 "Observations": [158, 57, 33, 5, 3],
             }
         )
-        fig_con = px.bar(
-            con_data,
-            x="Contractor",
-            y="Observations",
-            color="Observations",
-            color_continuousscale="Blues",
-        )
+      fig_con = px.bar(con_data, x="Contractor", y="Observations")
+      fig_con.update_traces(marker_color="#1d3557")
         fig_con.update_layout(margin=dict(l=0, r=0, t=10, b=0))
         st.plotly_chart(fig_con, use_container_width=True)
 
