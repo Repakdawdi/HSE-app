@@ -117,12 +117,12 @@ def load_data():
               "Notified electrical team to rectify",
           ],
           "Visual Photograph": [
-              "📷 Photo_TowerCrane.jpg",
-              "📷 Photo_PPE_Violation.jpg",
+              "📷 Photo #1 (Tower Crane)",
+              "📷 Photo #2 (PPE Violation)",
               "None",
-              "📷 Photo_Height_Work.jpg",
-              "📷 Photo_Collapse_Risk.jpg",
-              "📷 Photo_Electrical.jpg",
+              "📷 Photo #4 (Height Work)",
+              "📷 Photo #5 (Collapse Risk)",
+              "📷 Photo #6 (Electrical Panel)",
           ],
           "Company Concerned": [
               "Aram Tower",
@@ -270,7 +270,7 @@ if page == "📊 Higher Management Dashboard":
     st.plotly_chart(fig_status, use_container_width=True)
 
 # ----------------------------------------------------
-# PAGE 2: PRINTABLE DAILY HSE REPORT
+# PAGE 2: PRINTABLE DAILY HSE REPORT WITH PICTURES
 # ----------------------------------------------------
 elif page == "🖨️ Printable Daily HSE Report":
   st.title("📄 Daily HSE Report & Print Preview")
@@ -307,10 +307,31 @@ elif page == "🖨️ Printable Daily HSE Report":
   kpi5.metric("Safe Conditions", "1")
 
   st.markdown("---")
-  st.markdown(
-      "#### 📋 Daily Observation Log (OCR Summary with Photo References)"
-  )
+  st.markdown("#### 📋 Daily Observation Log (OCR Summary)")
   st.dataframe(df_register, use_container_width=True)
+
+  # Photo Evidence Gallery Section for Daily Report
+  st.markdown("---")
+  st.markdown("#### 📸 Photo Evidence & Visual Inspections Gallery")
+  p_col1, p_col2, p_col3 = st.columns(3)
+  with p_col1:
+    st.image(
+        "https://images.unsplash.com/photo-1541888946425-d0fbb18f8f2e?w=400",
+        caption="Obs #1: Working at Height (Tower Crane)",
+        use_container_width=True,
+    )
+  with p_col2:
+    st.image(
+        "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400",
+        caption="Obs #2: PPE Compliance Check",
+        use_container_width=True,
+    )
+  with p_col3:
+    st.image(
+        "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=400",
+        caption="Obs #6: Electrical Hazard Inspection",
+        use_container_width=True,
+    )
 
   st.markdown("---")
   sig1, sig2 = st.columns(2)
