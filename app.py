@@ -116,6 +116,14 @@ def load_data():
               "Barricaded and removed hazard",
               "Notified electrical team to rectify",
           ],
+          "Visual Photograph": [
+              "📷 Photo_TowerCrane.jpg",
+              "📷 Photo_PPE_Violation.jpg",
+              "None",
+              "📷 Photo_Height_Work.jpg",
+              "📷 Photo_Collapse_Risk.jpg",
+              "📷 Photo_Electrical.jpg",
+          ],
           "Company Concerned": [
               "Aram Tower",
               "Formwork and Reinforcement",
@@ -267,12 +275,10 @@ if page == "📊 Higher Management Dashboard":
 elif page == "🖨️ Printable Daily HSE Report":
   st.title("📄 Daily HSE Report & Print Preview")
   st.markdown(
-      "Formatted for daily management distribution and printing. Click your"
-      " browser's print button (`Ctrl + P` / `Cmd + P`) to export as PDF or"
-      " print."
+      "Formatted with photo evidence and KPIs for daily management"
+      " distribution. Press `Ctrl + P` to print or export as PDF."
   )
 
-  # Report Date selector
   report_date = st.date_input("Select Report Date", datetime.date.today())
 
   st.markdown("---")
@@ -301,7 +307,9 @@ elif page == "🖨️ Printable Daily HSE Report":
   kpi5.metric("Safe Conditions", "1")
 
   st.markdown("---")
-  st.markdown("#### 📋 Daily Observation Log (OCR Summary)")
+  st.markdown(
+      "#### 📋 Daily Observation Log (OCR Summary with Photo References)"
+  )
   st.dataframe(df_register, use_container_width=True)
 
   st.markdown("---")
@@ -402,6 +410,9 @@ elif page == "📝 New HSE Observation (Form)":
     action_taken = st.text_area(
         "Suggested / Immediate Action Taken",
         placeholder="Action taken or recommendation...",
+    )
+    uploaded_photo = st.file_uploader(
+        "Upload Visual Photograph", type=["jpg", "png", "jpeg"]
     )
     submitted = st.form_submit_button("Submit Observation Record")
     if submitted:
