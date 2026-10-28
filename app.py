@@ -10,16 +10,18 @@ st.set_page_config(
     page_title="AT HSE Management Dashboard", page_icon="🛡️", layout="wide"
 )
 
-# Custom CSS for styling & print optimization
+# Custom CSS for styling, large images in tables, & print optimization
 st.markdown(
     """
     <style>
     .main { background-color: #f8f9fa; }
     .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    table img { width: 180px !important; height: auto !important; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     @media print {
         body { background-color: white; color: black; }
         .stSidebar { display: none; }
         .stButton { display: none; }
+        table img { width: 140px !important; }
     }
     </style>
 """,
@@ -80,16 +82,16 @@ def load_data():
       "stats": ["OPEN", "CLOSED", "IN PROGRESS"],
   }
 
+  # DataFrame with HTML image tags so they render big and inside the table row
   df_register = pd.DataFrame(
       {
-          "No.": [1, 2, 3, 4, 5, 6],
+          "No.": [1, 2, 3, 4, 5],
           "Date": [
               "2026-10-18",
               "2026-10-18",
               "2026-10-18",
               "2026-10-19",
               "2026-10-26",
-              "2026-10-27",
           ],
           "Description": [
               "Labors working at Height on Tower crane without Harness",
@@ -97,7 +99,6 @@ def load_data():
               "Scaffolding without proper platform/harness",
               "Labor working at height without safety harness",
               "Wooden structure about to collapse",
-              "Uncovered electrical panel in workshop area",
           ],
           "Observed By": [
               "Repak Dawdi",
@@ -105,24 +106,21 @@ def load_data():
               "Repak Dawdi",
               "Repak Dawdi",
               "Repak Dawdi",
-              "Shad Ibrahim",
           ],
-          "Location": ["B1", "BT1", "B2", "B2", "B1", "Workshop"],
+          "Location": ["B1", "BT1", "B2", "B2", "B1"],
           "Suggested / Action Taken": [
               "Informed supervisor to provide harness",
               "Stopped work, instructed to wear PPE",
               "Updated HSE management procedure",
               "Stopped work, provided harness",
               "Barricaded and removed hazard",
-              "Notified electrical team to rectify",
           ],
           "Visual Photograph": [
-              "📷 Photo #1 (Tower Crane)",
-              "📷 Photo #2 (PPE Violation)",
-              "None",
-              "📷 Photo #4 (Height Work)",
-              "📷 Photo #5 (Collapse Risk)",
-              "📷 Photo #6 (Electrical Panel)",
+              '<img src="https://images.unsplash.com/photo-1541888946425-d0fbb18f8f2e?w=400">',
+              '<img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400">',
+              "No Photo",
+              '<img src="https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=400">',
+              '<img src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=400">',
           ],
           "Company Concerned": [
               "Aram Tower",
@@ -130,7 +128,6 @@ def load_data():
               "Formwork and Reinforcement",
               "Formwork and Reinforcement",
               "Formwork and Reinforcement",
-              "KNR",
           ],
           "Type": [
               "Intervention",
@@ -138,15 +135,13 @@ def load_data():
               "Observation",
               "Intervention",
               "Observation",
-              "Intervention",
           ],
-          "Discipline": ["Safety", "Safety", "Safety", "Safety", "Safety", "Safety"],
+          "Discipline": ["Safety", "Safety", "Safety", "Safety", "Safety"],
           "Submission Type": [
               "Unsafe Activity",
               "Unsafe Condition",
               "Unsafe Activity",
               "Unsafe Activity",
-              "Unsafe Condition",
               "Unsafe Condition",
           ],
           "Observation Category": [
@@ -155,9 +150,8 @@ def load_data():
               "Working at Height",
               "Working at Height",
               "Bypassing Safety Controls",
-              "Electrical Hazard",
           ],
-          "Status": ["CLOSED", "CLOSED", "IN PROGRESS", "CLOSED", "OPEN", "OPEN"],
+          "Status": ["CLOSED", "CLOSED", "IN PROGRESS", "CLOSED", "OPEN"],
       }
   )
   return lists, df_register
@@ -270,12 +264,12 @@ if page == "📊 Higher Management Dashboard":
     st.plotly_chart(fig_status, use_container_width=True)
 
 # ----------------------------------------------------
-# PAGE 2: PRINTABLE DAILY HSE REPORT WITH PICTURES
+# PAGE 2: PRINTABLE DAILY HSE REPORT WITH IN-TABLE PICTURES
 # ----------------------------------------------------
 elif page == "🖨️ Printable Daily HSE Report":
   st.title("📄 Daily HSE Report & Print Preview")
   st.markdown(
-      "Formatted with photo evidence and KPIs for daily management"
+      "Formatted with large photo evidence in the observation table for daily"
       " distribution. Press `Ctrl + P` to print or export as PDF."
   )
 
@@ -307,31 +301,14 @@ elif page == "🖨️ Printable Daily HSE Report":
   kpi5.metric("Safe Conditions", "1")
 
   st.markdown("---")
-  st.markdown("#### 📋 Daily Observation Log (OCR Summary)")
-  st.dataframe(df_register, use_container_width=True)
+  st.markdown(
+      "#### 📋 Daily Observation Log (OCR Summary with Large Visual Photographs)"
+  )
 
-  # Photo Evidence Gallery Section for Daily Report
-  st.markdown("---")
-  st.markdown("#### 📸 Photo Evidence & Visual Inspections Gallery")
-  p_col1, p_col2, p_col3 = st.columns(3)
-  with p_col1:
-    st.image(
-        "https://images.unsplash.com/photo-1541888946425-d0fbb18f8f2e?w=400",
-        caption="Obs #1: Working at Height (Tower Crane)",
-        use_container_width=True,
-    )
-  with p_col2:
-    st.image(
-        "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400",
-        caption="Obs #2: PPE Compliance Check",
-        use_container_width=True,
-    )
-  with p_col3:
-    st.image(
-        "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=400",
-        caption="Obs #6: Electrical Hazard Inspection",
-        use_container_width=True,
-    )
+  # Render dataframe using markdown / HTML to display large images properly inside table rows
+  st.write(
+      df_register.to_html(escape=False, index=False), unsafe_allow_html=True
+  )
 
   st.markdown("---")
   sig1, sig2 = st.columns(2)
@@ -404,7 +381,9 @@ elif page == "🔍 Category & Status Explorer":
   )
 
   st.subheader("📋 Filtered Observations Table")
-  st.dataframe(filtered_df, use_container_width=True)
+  st.write(
+      filtered_df.to_html(escape=False, index=False), unsafe_allow_html=True
+  )
 
 # ----------------------------------------------------
 # PAGE 4: NEW HSE OBSERVATION FORM
@@ -445,4 +424,4 @@ elif page == "📝 New HSE Observation (Form)":
 # ----------------------------------------------------
 elif page == "📋 Observation Register":
   st.title("📋 Live Observation Register")
-  st.dataframe(df_register, use_container_width=True)
+  st.write(df_register.to_html(escape=False, index=False), unsafe_allow_html=True)
