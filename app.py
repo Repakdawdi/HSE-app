@@ -102,17 +102,13 @@ if page == "📊 Higher Management Dashboard":
                 "Count": [29, 19, 18, 24, 21, 10],
             }
         )
-        fig_cat = px.bar(
-            cat_data,
-            x="Count",
-            y="Category",
-            orientation="h",
-            color="Count",
-            color_continuousscale="Reds",
-        )
-        fig_cat.update_layout(yaxis={"categoryorder": "total ascending"}, margin=dict(l=0, r=0, t=10, b=0))
-        st.plotly_chart(fig_cat, use_container_width=True)
-
+        fig_cat = px.bar(cat_data, x="Count", y="Category", orientation="h")
+      fig_cat.update_traces(marker_color="#e63946")
+      fig_cat.update_layout(
+          yaxis={"categoryorder": "total ascending"},
+          margin=dict(l=0, r=0, t=10, b=0),
+      )
+      st.plotly_chart(fig_cat, use_container_width=True)
     with chart_col2:
         st.subheader("📊 Submission Type Breakdown")
         sub_data = pd.DataFrame(
